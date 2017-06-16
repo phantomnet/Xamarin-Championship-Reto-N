@@ -18,6 +18,7 @@ using Microsoft.WindowsAzure.MobileServices;
 using RetoN;
 using Gcm.Client;
 
+using RegistroXamarinChampionship.Services;
 
 #if OFFLINE_SYNC_ENABLED
 using Microsoft.WindowsAzure.MobileServices.Sync;
@@ -31,6 +32,9 @@ namespace RetoN
                Theme = "@style/AppTheme")]
     public class ToDoActivity : Activity
     {
+
+        string emailRegistro = "at_charles@hotmail.com"; 
+        string codigoReto = "RetoN + e4dcd + https://github.com/phantomnet/Xamarin-Championship-Reto-N"; 
 
         // Create a new instance field for this activity.
         static ToDoActivity instance = new ToDoActivity();
@@ -114,6 +118,8 @@ namespace RetoN
 
             // Load the items from the mobile app backend.
             OnRefreshItemsSelected();
+
+            RegistrarReto();
         }
 
 #if OFFLINE_SYNC_ENABLED
@@ -265,6 +271,31 @@ namespace RetoN
             builder.SetTitle(title);
             builder.Create().Show();
         }
+
+        private async void RegistrarReto()
+        {
+            try
+            {
+                ServiceHelper serviceHelper = new ServiceHelper();
+                string AndroidId = Android.Provider.Settings.Secure.GetString(ContentResolver, Android.Provider.Settings.Secure.AndroidId);
+
+                if (string.IsNullOrEmpty(emailRegistro) || string.IsNullOrEmpty(codigoReto))
+                {
+                    Toast.MakeText(this, "Recuerda modificar el código fuente para ingresar tu e-mail y código de reto", ToastLength.Short).Show();
+                }
+                else
+                {
+                    Toast.MakeText(this, "Enviando tu registro", ToastLength.Short).Show();
+                    await serviceHelper.InsertarEntidad(emailRegistro, codigoReto, AndroidId);
+                    Toast.MakeText(this, "Gracias por registrarte", ToastLength.Long).Show();
+                }
+            }
+            catch (Exception exc)
+            {
+                Toast.MakeText(this, exc.Message, ToastLength.Long).Show();
+            }
+        }
+
     }
 }
 
